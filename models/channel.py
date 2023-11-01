@@ -4,6 +4,7 @@ import asyncio
 import time
 import os
 from providers.twitch import parseTwitchEmote
+import threading
 
 load_dotenv()
 CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
@@ -21,6 +22,7 @@ class Channel:
         self.twitch_emotes = []
         self.twitch_emotes_updated = 0
         self.login = login
+        self.lock = threading.Lock()
 
         if login != '_global':
             asyncio.run(self.getUserId())
@@ -46,5 +48,6 @@ class Channel:
         print(f'[{self.login}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
 
     def getTwitchEmotes(self):
-        asyncio.run(self.updateTwitchEmotes())
-        return [e.toDict() for e in self.twitch_emotes]
+        with self.lock:
+            asyncio.run(self.updateTwitchEmotes())
+            return [e.toDict() for e in self.twitch_emotes]
