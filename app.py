@@ -36,10 +36,11 @@ class EmoteUrl:
        return dict(size=self.size, url=self.url)
 
 class Emote:
-    def __init__(self, code, provider, zero_width):
+    def __init__(self, code, provider, zero_width, animated):
         self.code = code
         self.provider = provider
         self.zero_width = zero_width
+        self.animated = animated
         self.urls = []
 
     def toDict(self):
@@ -47,6 +48,7 @@ class Emote:
             code=self.code,
             provider=self.provider,
             zero_width=self.zero_width,
+            animated = self.animated,
             urls=[u.toDict() for u in self.urls]
         )
 
@@ -57,7 +59,8 @@ def parseTwitchEmote(e, template):
     emote = Emote(
         code=e.name,
         provider=0,
-        zero_width=False
+        zero_width=False,
+        animated='animated' in e.format
     )
 
     for scale in e.scale:
