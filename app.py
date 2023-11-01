@@ -4,11 +4,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging
-from twitchAPI.twitch import Twitch
-import os
-from dotenv import load_dotenv
-import asyncio
-import time
+from models.channel import Channel
 
 # Providers
 # 0: Twitch
@@ -16,104 +12,7 @@ import time
 # 2: BTTV
 # 3: FFZ
 
-CACHE_TIMEOUT = 300 # Emote cache duration in seconds
-
-load_dotenv()
-TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
-TWITCH_SECRET = os.getenv('TWITCH_SECRET')
-
-global_emotes_twitch = []
-global_emotes_twitch_updated = 0
-
 channels = {}
-
-class EmoteUrl:
-    def __init__(self, size, url):
-        self.size = size
-        self.url = url
-
-    def toDict(self):
-       return dict(size=self.size, url=self.url)
-
-class Emote:
-    def __init__(self, code, provider, zero_width, animated):
-        self.code = code
-        self.provider = provider
-        self.zero_width = zero_width
-        self.animated = animated
-        self.urls = []
-
-    def toDict(self):
-        return dict(
-            code=self.code,
-            provider=self.provider,
-            zero_width=self.zero_width,
-            animated = self.animated,
-            urls=[u.toDict() for u in self.urls]
-        )
-
-    def addUrl(self, size, url):
-        self.urls.append(EmoteUrl(size, url))
-
-def parseTwitchEmote(e, template):
-    emote = Emote(
-        code=e.name,
-        provider=0,
-        zero_width=False,
-        animated='animated' in e.format
-    )
-
-    for scale in e.scale:
-        values = {
-            'id': e.id,
-            'format': 'default',
-            'theme_mode': e.theme_mode[0],
-            'scale': scale,
-        }
-        url = template.replace('{{', '{').replace('}}', '}').format(**values)
-        size = f"{int(float(scale))}x"
-        emote.addUrl(size, url)
-
-    return emote
-
-class Channel:
-    async def getUserId(self):
-        twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
-        async for user in twitch.get_users(logins=self.login):
-            self.user_id = user.id
-            print(f'[{self.login}] Found user: {self.user_id}')
-
-    def __init__(self, login):
-        self.twitch_emotes = []
-        self.twitch_emotes_updated = 0
-        self.login = login
-
-        if login != '_global':
-            asyncio.run(self.getUserId())
-
-    async def updateTwitchEmotes(self):
-        if (time.time() - self.twitch_emotes_updated) < CACHE_TIMEOUT:
-            print(f'[{self.login}] Using cached twitch emotes.')
-            return
-
-        print(f'[{self.login}] Updating twitch emotes..')
-        self.twitch_emotes.clear()
-        twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
-
-        if self.login == '_global':
-            emotes = await twitch.get_global_emotes()
-        else:
-            emotes = await twitch.get_channel_emotes(self.user_id)
-        for e in emotes:
-            emote = parseTwitchEmote(e, emotes.template)
-            self.twitch_emotes.append(emote)
-
-        self.twitch_emotes_updated = time.time()
-        print(f'[{self.login}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
-
-    def getTwitchEmotes(self):
-        asyncio.run(self.updateTwitchEmotes())
-        return [e.toDict() for e in self.twitch_emotes]
 
 print("Starting server..")
 
