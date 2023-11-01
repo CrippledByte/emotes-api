@@ -93,29 +93,36 @@ async def update_twitch_global_emotes():
     print(f'Updated global twitch emotes: {len(global_emotes_twitch)} emotes.')
 
 class Channel:
-    twitch_emotes = []
-    twitch_emotes_updated = 0
+    async def getUserId(self):
+        twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
+        async for user in twitch.get_users(logins=self.login):
+            self.user_id = user.id
+            print(f'[{self.login}] Found user: {self.user_id}')
 
-    def __init__(self, broadcaster_id):
-        self.broadcaster_id = broadcaster_id
+    def __init__(self, login):
+        self.twitch_emotes = []
+        self.twitch_emotes_updated = 0
+        self.login = login
+        asyncio.run(self.getUserId())
 
     async def updateTwitchEmotes(self):
         if (time.time() - self.twitch_emotes_updated) < CACHE_TIMEOUT:
-            print(f'[{self.broadcaster_id}] Using cached twitch emotes.')
+            print(f'[{self.login}] Using cached twitch emotes.')
             return
 
-        print(f'[{self.broadcaster_id}] Updating twitch emotes..')
+        print(f'[{self.login}] Updating twitch emotes..')
         self.twitch_emotes.clear()
         twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
-        emotes = await twitch.get_channel_emotes(self.broadcaster_id)
+        emotes = await twitch.get_channel_emotes(self.user_id)
         for e in emotes:
             emote = parseTwitchEmote(e, emotes.template)
             self.twitch_emotes.append(emote)
 
         self.twitch_emotes_updated = time.time()
-        print(f'[{self.broadcaster_id}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
+        print(f'[{self.login}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
 
     def getTwitchEmotes(self):
+        asyncio.run(self.updateTwitchEmotes())
         return [e.toDict() for e in self.twitch_emotes]
 
 print("Starting server..")
@@ -149,15 +156,14 @@ def global_emotes(provider):
 
     return custom_error(404, 'Provider not found.')
 
-@app.route('/channel/<channel>/<provider>')
+@app.route('/channel/<login>/<provider>')
 @limiter.limit("60/minute")
-def channel_emotes(channel, provider):
-    if channel not in channels:
-        channels[channel] = Channel(channel)
+def channel_emotes(login, provider):
+    if login not in channels:
+        channels[login] = Channel(login)
 
     if provider == 'twitch':
-        asyncio.run(channels[channel].updateTwitchEmotes())
-        return jsonify(channels[channel].getTwitchEmotes())
+        return jsonify(channels[login].getTwitchEmotes())
 
     return custom_error(404, 'Provider not found.')
 
