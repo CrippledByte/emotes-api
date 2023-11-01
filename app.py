@@ -149,13 +149,17 @@ def global_emotes(provider):
 
     return custom_error(404, 'Provider not found.')
 
-@app.route('/channel/<channel>/twitch')
+@app.route('/channel/<channel>/<provider>')
 @limiter.limit("60/minute")
-def channel_emotes(channel):
+def channel_emotes(channel, provider):
     if channel not in channels:
         channels[channel] = Channel(channel)
-    asyncio.run(channels[channel].updateTwitchEmotes())
-    return jsonify(channels[channel].getTwitchEmotes())
+
+    if provider == 'twitch':
+        asyncio.run(channels[channel].updateTwitchEmotes())
+        return jsonify(channels[channel].getTwitchEmotes())
+
+    return custom_error(404, 'Provider not found.')
 
 if __name__ == '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
