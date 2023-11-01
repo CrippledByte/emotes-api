@@ -25,6 +25,8 @@ TWITCH_SECRET = os.getenv('TWITCH_SECRET')
 global_emotes_twitch = []
 global_emotes_twitch_updated = 0
 
+channels = {}
+
 class EmoteUrl:
     def __init__(self, size, url):
         self.size = size
@@ -90,6 +92,32 @@ async def update_twitch_global_emotes():
     global_emotes_twitch_updated = time.time()
     print(f'Updated global twitch emotes: {len(global_emotes_twitch)} emotes.')
 
+class Channel:
+    twitch_emotes = []
+    twitch_emotes_updated = 0
+
+    def __init__(self, broadcaster_id):
+        self.broadcaster_id = broadcaster_id
+
+    async def updateTwitchEmotes(self):
+        if (time.time() - self.twitch_emotes_updated) < CACHE_TIMEOUT:
+            print(f'[{self.broadcaster_id}] Using cached twitch emotes.')
+            return
+
+        print(f'[{self.broadcaster_id}] Updating twitch emotes..')
+        self.twitch_emotes.clear()
+        twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
+        emotes = await twitch.get_channel_emotes(self.broadcaster_id)
+        for e in emotes:
+            emote = parseTwitchEmote(e, emotes.template)
+            self.twitch_emotes.append(emote)
+
+        self.twitch_emotes_updated = time.time()
+        print(f'[{self.broadcaster_id}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
+
+    def getTwitchEmotes(self):
+        return [e.toDict() for e in self.twitch_emotes]
+
 print("Starting server..")
 
 # Flask
@@ -120,6 +148,14 @@ def global_emotes(provider):
         return jsonify([e.toDict() for e in global_emotes_twitch])
 
     return custom_error(404, 'Provider not found.')
+
+@app.route('/channel/<channel>/twitch')
+@limiter.limit("60/minute")
+def channel_emotes(channel):
+    if channel not in channels:
+        channels[channel] = Channel(channel)
+    asyncio.run(channels[channel].updateTwitchEmotes())
+    return jsonify(channels[channel].getTwitchEmotes())
 
 if __name__ == '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
