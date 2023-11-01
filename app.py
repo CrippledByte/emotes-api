@@ -136,20 +136,7 @@ def custom_error(status_code, message):
 def rate_limit_exceeded(error):
     return custom_error(429, 'Rate limit exceeded. Please slow down (60 requests per minute).')
 
-@app.route('/global/<provider>')
-@limiter.limit("60/minute")
-def global_emotes(provider):
-    if '_global' not in channels:
-        channels['_global'] = Channel('_global')
-
-    if provider == 'twitch':
-        return jsonify(channels['_global'].getTwitchEmotes())
-
-    return custom_error(404, 'Provider not found.')
-
-@app.route('/channel/<login>/<provider>')
-@limiter.limit("60/minute")
-def channel_emotes(login, provider):
+def get_emotes(login, provider):
     if login not in channels:
         channels[login] = Channel(login)
 
@@ -157,6 +144,16 @@ def channel_emotes(login, provider):
         return jsonify(channels[login].getTwitchEmotes())
 
     return custom_error(404, 'Provider not found.')
+
+@app.route('/global/<provider>')
+@limiter.limit("60/minute")
+def global_emotes(provider):
+    return get_emotes('_global', provider)
+
+@app.route('/channel/<login>/<provider>')
+@limiter.limit("60/minute")
+def channel_emotes(login, provider):
+    return get_emotes(login, provider)
 
 if __name__ == '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
