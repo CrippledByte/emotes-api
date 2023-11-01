@@ -76,25 +76,6 @@ def parseTwitchEmote(e, template):
 
     return emote
 
-# Twitch API
-async def update_twitch_global_emotes():
-    global global_emotes_twitch_updated
-    if (time.time() - global_emotes_twitch_updated) < CACHE_TIMEOUT:
-        print('Using cached global twitch emotes.')
-        return
-
-    print('Updating global twitch emotes..')
-    global_emotes_twitch.clear()
-
-    twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
-    emotes = await twitch.get_global_emotes()
-    for e in emotes:
-        emote = parseTwitchEmote(e, emotes.template)
-        global_emotes_twitch.append(emote)
-
-    global_emotes_twitch_updated = time.time()
-    print(f'Updated global twitch emotes: {len(global_emotes_twitch)} emotes.')
-
 class Channel:
     async def getUserId(self):
         twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
@@ -106,7 +87,9 @@ class Channel:
         self.twitch_emotes = []
         self.twitch_emotes_updated = 0
         self.login = login
-        asyncio.run(self.getUserId())
+
+        if login != '_global':
+            asyncio.run(self.getUserId())
 
     async def updateTwitchEmotes(self):
         if (time.time() - self.twitch_emotes_updated) < CACHE_TIMEOUT:
@@ -116,7 +99,11 @@ class Channel:
         print(f'[{self.login}] Updating twitch emotes..')
         self.twitch_emotes.clear()
         twitch = await Twitch(TWITCH_CLIENT_ID, TWITCH_SECRET)
-        emotes = await twitch.get_channel_emotes(self.user_id)
+
+        if self.login == '_global':
+            emotes = await twitch.get_global_emotes()
+        else:
+            emotes = await twitch.get_channel_emotes(self.user_id)
         for e in emotes:
             emote = parseTwitchEmote(e, emotes.template)
             self.twitch_emotes.append(emote)
@@ -152,10 +139,11 @@ def rate_limit_exceeded(error):
 @app.route('/global/<provider>')
 @limiter.limit("60/minute")
 def global_emotes(provider):
+    if '_global' not in channels:
+        channels['_global'] = Channel('_global')
+
     if provider == 'twitch':
-        print('Twitch emotes requested.')
-        asyncio.run(update_twitch_global_emotes())
-        return jsonify([e.toDict() for e in global_emotes_twitch])
+        return jsonify(channels['_global'].getTwitchEmotes())
 
     return custom_error(404, 'Provider not found.')
 
