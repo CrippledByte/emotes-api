@@ -63,12 +63,12 @@ def get_emotes(login, provider):
 
     return custom_error(404, 'Provider not found.')
 
-@app.route('/global/<provider>')
+@app.route('/v1/global/<provider>')
 @limiter.limit("60/minute")
 def global_emotes(provider):
     return get_emotes('_global', provider)
 
-@app.route('/channel/<login>/<provider>')
+@app.route('/v1/channel/<login>/<provider>')
 @limiter.limit("60/minute")
 def channel_emotes(login, provider):
     return get_emotes(login, provider)
