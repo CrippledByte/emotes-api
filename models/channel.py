@@ -5,6 +5,7 @@ import os
 import threading
 import providers.twitch
 import providers.bttv
+import providers.ffz
 
 load_dotenv()
 TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
@@ -24,6 +25,9 @@ class Channel:
         self.bttv_emotes = []
         self.bttv_emotes_updated = 0
         self.bttv_lock = threading.Lock()
+        self.ffz_emotes = []
+        self.ffz_emotes_updated = 0
+        self.ffz_lock = threading.Lock()
         self.login = login
 
         if login != '_global':
@@ -35,7 +39,11 @@ class Channel:
     def getBTTVEmotes(self):
         return providers.bttv.getBTTVEmotes(self)
 
+    def getFFZEmotes(self):
+        return providers.ffz.getFFZEmotes(self)
+
     def getEmotes(self):
         twitch_emotes = self.getTwitchEmotes()
         bttv_emotes = self.getBTTVEmotes()
-        return twitch_emotes + bttv_emotes
+        ffz_emotes = self.getFFZEmotes()
+        return twitch_emotes + bttv_emotes + ffz_emotes
