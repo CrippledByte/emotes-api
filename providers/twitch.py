@@ -52,6 +52,6 @@ async def updateTwitchEmotes(self):
     print(f'[{self.login}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
 
 def getTwitchEmotes(self):
-    with self.lock:
+    with self.twitch_lock:
         asyncio.run(updateTwitchEmotes(self))
         return [e.toDict() for e in self.twitch_emotes]

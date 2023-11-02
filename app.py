@@ -41,6 +41,10 @@ def get_emotes(login, provider):
 
     if provider == 'twitch':
         return jsonify(channels[login].getTwitchEmotes())
+    elif provider == 'bttv':
+        return jsonify(channels[login].getBTTVEmotes())
+    elif provider == 'all':
+        return jsonify(channels[login].getEmotes())
 
     return custom_error(404, 'Provider not found.')
 
