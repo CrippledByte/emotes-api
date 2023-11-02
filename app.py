@@ -4,6 +4,9 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging
+from cachetools import LRUCache, cached
+from dotenv import load_dotenv
+import os
 from models.channel import Channel
 
 # Providers
@@ -22,6 +25,11 @@ CORS(app)
 Compress(app)
 limiter = Limiter(app, key_func=get_remote_address)
 
+load_dotenv()
+CACHE_CHANNEL_LIMIT = int(os.getenv('CACHE_CHANNEL_LIMIT', 500))
+
+cache = LRUCache(maxsize=CACHE_CHANNEL_LIMIT)
+
 def custom_error(status_code, message):
     response = jsonify({
         'status_code': status_code,
@@ -35,20 +43,23 @@ def custom_error(status_code, message):
 def rate_limit_exceeded(error):
     return custom_error(429, 'Rate limit exceeded. Please slow down (60 requests per minute).')
 
+@cached(cache)
+def get_channel(login):
+    return Channel(login)
+
 def get_emotes(login, provider):
-    if login not in channels:
-        channels[login] = Channel(login)
+    channel = get_channel(login)
 
     if provider == 'twitch':
-        return jsonify(channels[login].getTwitchEmotes())
+        return jsonify(channel.getTwitchEmotes())
     elif provider == '7tv':
-        return jsonify(channels[login].getSevenTVEmotes())
+        return jsonify(channel.getSevenTVEmotes())
     elif provider == 'bttv':
-        return jsonify(channels[login].getBTTVEmotes())
+        return jsonify(channel.getBTTVEmotes())
     elif provider == 'ffz':
-        return jsonify(channels[login].getFFZEmotes())
+        return jsonify(channel.getFFZEmotes())
     elif provider == 'all':
-        return jsonify(channels[login].getEmotes())
+        return jsonify(channel.getEmotes())
 
     return custom_error(404, 'Provider not found.')
 

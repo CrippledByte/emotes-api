@@ -5,6 +5,7 @@ asyncio==3.4.3
 asynctest==0.13.0
 attrs==23.1.0
 Brotli==1.1.0
+cachetools==5.3.2
 certifi==2023.7.22
 charset-normalizer==2.0.12
 click==8.1.7
