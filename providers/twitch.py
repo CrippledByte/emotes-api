@@ -10,7 +10,7 @@ CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
 TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 TWITCH_SECRET = os.getenv('TWITCH_SECRET')
 
-def parseTwitchEmote(e, template):
+def parseEmote(e, template):
     emote = Emote(
         code=e.name,
         provider=0,
@@ -31,7 +31,7 @@ def parseTwitchEmote(e, template):
 
     return emote
 
-async def updateTwitchEmotes(self):
+async def updateEmotes(self):
     if (time.time() - self.twitch_emotes_updated) < CACHE_TIMEOUT:
         print(f'[{self.login}] Using cached twitch emotes.')
         return
@@ -45,13 +45,13 @@ async def updateTwitchEmotes(self):
     else:
         emotes = await twitch.get_channel_emotes(self.user_id)
     for e in emotes:
-        emote = parseTwitchEmote(e, emotes.template)
+        emote = parseEmote(e, emotes.template)
         self.twitch_emotes.append(emote)
 
     self.twitch_emotes_updated = time.time()
     print(f'[{self.login}] Updated twitch emotes: {len(self.twitch_emotes)} emotes.')
 
-def getTwitchEmotes(self):
+def getEmotes(self):
     with self.twitch_lock:
-        asyncio.run(updateTwitchEmotes(self))
+        asyncio.run(updateEmotes(self))
         return [e.toDict() for e in self.twitch_emotes]

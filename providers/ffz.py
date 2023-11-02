@@ -9,7 +9,7 @@ base_url = 'https://api.frankerfacez.com/v1'
 load_dotenv()
 CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
 
-def parseFFZEmote(e):
+def parseEmote(e):
     emote = Emote(
         code=e['name'],
         provider=3,
@@ -24,7 +24,7 @@ def parseFFZEmote(e):
 
     return emote
 
-def updateFFZEmotes(self):
+def updateEmotes(self):
     if (time.time() - self.ffz_emotes_updated) < CACHE_TIMEOUT:
         print(f'[{self.login}] Using cached ffz emotes.')
         return
@@ -53,13 +53,13 @@ def updateFFZEmotes(self):
             emotes.extend(data['sets'][str(set_id)]['emoticons'])
 
     for e in emotes:
-        emote = parseFFZEmote(e)
+        emote = parseEmote(e)
         self.ffz_emotes.append(emote)
 
     self.ffz_emotes_updated = time.time()
     print(f'[{self.login}] Updated ffz emotes: {len(self.ffz_emotes)} emotes.')
 
-def getFFZEmotes(self):
+def getEmotes(self):
     with self.ffz_lock:
-        updateFFZEmotes(self)
+        updateEmotes(self)
         return [e.toDict() for e in self.ffz_emotes]

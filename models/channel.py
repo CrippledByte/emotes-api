@@ -34,13 +34,13 @@ class Channel:
             asyncio.run(self.getUserId())
 
     def getTwitchEmotes(self):
-        return providers.twitch.getTwitchEmotes(self)
+        return providers.twitch.getEmotes(self)
 
     def getBTTVEmotes(self):
-        return providers.bttv.getBTTVEmotes(self)
+        return providers.bttv.getEmotes(self)
 
     def getFFZEmotes(self):
-        return providers.ffz.getFFZEmotes(self)
+        return providers.ffz.getEmotes(self)
 
     def getEmotes(self):
         twitch_emotes = self.getTwitchEmotes()

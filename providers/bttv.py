@@ -16,7 +16,7 @@ ZERO_WIDTH = [
 		"ReinDeer", "CandyCane", "cvMask", "cvHazmat"
 ]
 
-def parseBTTVEmote(e):
+def parseEmote(e):
     emote = Emote(
         code=e['code'],
         provider=2,
@@ -35,7 +35,7 @@ def merge_two_dicts(x, y):
     z.update(y)
     return z
 
-def updateBTTVEmotes(self):
+def updateEmotes(self):
     if (time.time() - self.bttv_emotes_updated) < CACHE_TIMEOUT:
         print(f'[{self.login}] Using cached bttv emotes.')
         return
@@ -58,13 +58,13 @@ def updateBTTVEmotes(self):
             emotes.extend(data['sharedEmotes'])
 
     for e in emotes:
-        emote = parseBTTVEmote(e)
+        emote = parseEmote(e)
         self.bttv_emotes.append(emote)
 
     self.bttv_emotes_updated = time.time()
     print(f'[{self.login}] Updated bttv emotes: {len(self.bttv_emotes)} emotes.')
 
-def getBTTVEmotes(self):
+def getEmotes(self):
     with self.bttv_lock:
-        updateBTTVEmotes(self)
+        updateEmotes(self)
         return [e.toDict() for e in self.bttv_emotes]
