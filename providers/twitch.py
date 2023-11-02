@@ -6,7 +6,7 @@ import asyncio
 from models.emotes import Emote
 
 load_dotenv()
-CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
+CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT_TWITCH', 300))
 TWITCH_CLIENT_ID = os.getenv('TWITCH_CLIENT_ID')
 TWITCH_SECRET = os.getenv('TWITCH_SECRET')
 

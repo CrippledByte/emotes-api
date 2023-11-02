@@ -7,7 +7,7 @@ from models.emotes import Emote
 base_url = 'https://api.frankerfacez.com/v1'
 
 load_dotenv()
-CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
+CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT_FFZ', 300))
 
 def parseEmote(e):
     emote = Emote(

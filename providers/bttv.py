@@ -7,7 +7,7 @@ from models.emotes import Emote
 base_url = 'https://api.betterttv.net/3'
 
 load_dotenv()
-CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
+CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT_BTTV', 300))
 
 # https://github.com/Chatterino/chatterino2/blob/1043f9f8037ed53fbaf1812f289a4e3db152e140/src/providers/twitch/TwitchMessageBuilder.cpp#L51
 # https://github.com/flex3r/DankChat/blob/9aa32300df8c71ef84758d0d8a9196616fc8a526/app/src/main/kotlin/com/flxrs/dankchat/data/repo/EmoteRepository.kt#L612

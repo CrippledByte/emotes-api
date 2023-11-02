@@ -7,7 +7,7 @@ from models.emotes import Emote
 base_url = 'https://7tv.io/v3'
 
 load_dotenv()
-CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT', 300))
+CACHE_TIMEOUT = int(os.getenv('CACHE_TIMEOUT_7TV', 300))
 
 EmoteFlagsZeroWidth = 1 << 8 # https://github.com/SevenTV/Common/blob/4139fcc3eb8d79003573b26b552ef112ec85b8df/structures/v3/type.emote.go#L52
 
