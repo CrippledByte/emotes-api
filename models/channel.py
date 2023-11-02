@@ -4,6 +4,7 @@ import asyncio
 import os
 import threading
 import providers.twitch
+import providers.seventv
 import providers.bttv
 import providers.ffz
 
@@ -22,6 +23,9 @@ class Channel:
         self.twitch_emotes = []
         self.twitch_emotes_updated = 0
         self.twitch_lock = threading.Lock()
+        self.seventv_emotes = []
+        self.seventv_emotes_updated = 0
+        self.seventv_lock = threading.Lock()
         self.bttv_emotes = []
         self.bttv_emotes_updated = 0
         self.bttv_lock = threading.Lock()
@@ -36,6 +40,9 @@ class Channel:
     def getTwitchEmotes(self):
         return providers.twitch.getEmotes(self)
 
+    def getSevenTVEmotes(self):
+        return providers.seventv.getEmotes(self)
+
     def getBTTVEmotes(self):
         return providers.bttv.getEmotes(self)
 
@@ -44,6 +51,7 @@ class Channel:
 
     def getEmotes(self):
         twitch_emotes = self.getTwitchEmotes()
+        seventv_emotes = self.getSevenTVEmotes()
         bttv_emotes = self.getBTTVEmotes()
         ffz_emotes = self.getFFZEmotes()
-        return twitch_emotes + bttv_emotes + ffz_emotes
+        return twitch_emotes + seventv_emotes + bttv_emotes + ffz_emotes

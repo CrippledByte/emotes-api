@@ -41,6 +41,8 @@ def get_emotes(login, provider):
 
     if provider == 'twitch':
         return jsonify(channels[login].getTwitchEmotes())
+    elif provider == '7tv':
+        return jsonify(channels[login].getSevenTVEmotes())
     elif provider == 'bttv':
         return jsonify(channels[login].getBTTVEmotes())
     elif provider == 'ffz':
