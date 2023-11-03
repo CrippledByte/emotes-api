@@ -36,7 +36,7 @@ def custom_error(status_code, message):
         'message': message
     })
     response.status_code = status_code
-    app.logger.warning('Returning error:', status_code, message)
+    app.logger.warning('Returning error: %s %s', status_code, message)
     return response
 
 @app.errorhandler(404)
