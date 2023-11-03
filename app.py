@@ -39,6 +39,10 @@ def custom_error(status_code, message):
     app.logger.warning('Returning error:', status_code, message)
     return response
 
+@app.errorhandler(404)
+def not_found(error):
+    return custom_error(404, 'Page not found.')
+
 @app.errorhandler(429)
 def rate_limit_exceeded(error):
     return custom_error(429, 'Rate limit exceeded. Please slow down (60 requests per minute).')
