@@ -47,6 +47,14 @@ def not_found(error):
 def rate_limit_exceeded(error):
     return custom_error(429, 'Rate limit exceeded. Please slow down (60 requests per minute).')
 
+@app.route('/')
+def index():
+    return jsonify({
+        'global': '/v1/global/<provider>',
+        'channel': '/v1/channel/<username>/<provider>',
+        'providers': 'twitch, 7tv, bttv, ffz, all'
+    })
+
 @cached(cache)
 def get_channel(login):
     return Channel(login)
