@@ -1,35 +1,15 @@
 import unittest
 from providers.ffz import parseEmote
+import json
+
+with open('test/ffz_global.json', 'r') as file:
+    data = json.load(file)
+
+def getEmote(set, code):
+    return [d for d in data['sets'][str(set)]['emoticons'] if d['name'] == code][0]
 
 EMOTES = [
-    {
-        "id": 28138,
-        "name": "ZliL",
-        "height": 23,
-        "width": 32,
-        "public": False,
-        "hidden": True,
-        "modifier": False,
-        "modifier_flags": 0,
-        "offset": None,
-        "margins": None,
-        "css": None,
-        "owner": {
-            "_id": 1,
-            "name": "sirstendec",
-            "display_name": "SirStendec"
-        },
-        "artist": None,
-        "urls": {
-            "1": "https://cdn.frankerfacez.com/emote/28138/1",
-            "2": "https://cdn.frankerfacez.com/emote/28138/2",
-            "4": "https://cdn.frankerfacez.com/emote/28138/4"
-        },
-        "status": 1,
-        "usage_count": 1,
-        "created_at": "2015-06-03T00:37:44.041Z",
-        "last_updated": "2015-06-04T20:22:11.432Z"
-    },
+    getEmote(3, 'ZliL'),
 ]
 
 class TestParsing(unittest.TestCase):

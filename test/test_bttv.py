@@ -1,23 +1,16 @@
 import unittest
 from providers.bttv import parseEmote
+import json
+
+with open('test/bttv_global.json', 'r') as file:
+    data = json.load(file)
+
+def getEmote(code):
+    return [d for d in data if d['code'] == code][0]
 
 EMOTES = [
-    {
-        "id": "566ca38765dbbdab32ec0560",
-        "code": "SourPls",
-        "imageType": "gif",
-        "animated": True,
-        "userId": "5561169bd6b9d206222a8c19",
-        "modifier": False,
-    },
-    {
-        "id": "5e76d399d6581c3724c0f0b8",
-        "code": "cvMask",
-        "imageType": "png",
-        "animated": False,
-        "userId": "54ee2465b822020506c52a52",
-        "modifier": False,
-    },
+    getEmote('SourPls'),
+    getEmote('cvMask'),
 ]
 
 class TestParsing(unittest.TestCase):
