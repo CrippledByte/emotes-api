@@ -36,7 +36,6 @@ Available providers: `twitch`, `7tv`, `bttv`, `ffz`, `all`.
     ],
     "zero_width": false
   },
-  ...
 ]
 ```
 
@@ -56,7 +55,7 @@ pip3 install -r requirements.txt
 ```
 3. Run the server.
 ```python
-gunicorn --preload --bing 0.0.0.0:8000 app:app
+gunicorn --preload --bind 0.0.0.0:8000 app:app
 ```
 
 # Development
