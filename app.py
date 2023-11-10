@@ -23,7 +23,7 @@ print("Starting server..")
 app = Flask(__name__)
 CORS(app)
 Compress(app)
-limiter = Limiter(app, key_func=get_remote_address)
+limiter = Limiter(app, key_func=get_remote_address, headers_enabled=True)
 
 load_dotenv()
 CACHE_CHANNEL_LIMIT = int(os.getenv('CACHE_CHANNEL_LIMIT', 500))
