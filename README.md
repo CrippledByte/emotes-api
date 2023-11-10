@@ -49,17 +49,20 @@ Available providers: `twitch`, `7tv`, `bttv`, `ffz`, `all`.
 
 # Setup
 1. Register an app on [dev.twitch.tv](https://dev.twitch.tv/console/apps/create) and enter the client ID and secret in [.env](.env.example).
-2. Install requirements.
-```python
+2. Install requirements:
+```bash
+mkdir env
+virtualenv env
+source env/bin/activate
 pip3 install -r requirements.txt
 ```
-3. Run the server.
-```python
+3. Run the server:
+```bash
 gunicorn --preload --bind 0.0.0.0:8000 app:app
 ```
 
 # Development
-- Unit tests
-```python
+- Running unit tests:
+```bash
 python3 -m unittest
 ```
