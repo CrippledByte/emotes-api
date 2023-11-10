@@ -29,7 +29,7 @@ multidict==6.0.4
 packaging==23.2
 python-dateutil==2.8.2
 python-dotenv==0.21.1
-requests==2.27.1
+requests==2.31.0
 six==1.16.0
 twitchAPI==4.0.1
 typing-extensions==4.7.1
