@@ -52,7 +52,7 @@ def index():
     return jsonify({
         'global': '/v1/global/<provider>',
         'channel': '/v1/channel/<username>/<provider>',
-        'providers': 'twitch, 7tv, bttv, ffz, all'
+        'providers': ['twitch', '7tv', 'bttv', 'ffz', 'all'],
     })
 
 @cached(cache)
