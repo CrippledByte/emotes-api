@@ -27,6 +27,7 @@ limiter = Limiter(app, key_func=get_remote_address, headers_enabled=True)
 
 load_dotenv()
 CACHE_CHANNEL_LIMIT = int(os.getenv('CACHE_CHANNEL_LIMIT', 500))
+MAX_CACHE_TTL = int(os.getenv('MAX_CACHE_TTL', 300))
 
 cache = LRUCache(maxsize=CACHE_CHANNEL_LIMIT)
 
@@ -46,6 +47,12 @@ def not_found(error):
 @app.errorhandler(429)
 def rate_limit_exceeded(error):
     return custom_error(429, 'Rate limit exceeded. Please slow down (60 requests per minute).')
+
+if (MAX_CACHE_TTL > 0):
+    @app.after_request
+    def add_header(response):
+        response.headers['Cache-Control'] = f'max-age={MAX_CACHE_TTL}'
+        return response
 
 @app.route('/')
 def index():
